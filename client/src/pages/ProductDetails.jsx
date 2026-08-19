@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   ShoppingCart,
   ArrowLeft,
@@ -10,20 +10,24 @@ import {
 } from "lucide-react";
 import { getProduct } from "../services/productService";
 import { addToCart, getCart } from "../services/cartService";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setCart } from "../redux/slices/cartSlice";
 import toast from "react-hot-toast";
 import Loader from "../components/common/Loader";
+import OtpModal from "../components/modals/OtpModal";
 
 export default function ProductDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [showOtp, setShowOtp] = useState(false);
 
   const dispatch = useDispatch();
+  const token = useSelector((s) => s.auth.token);
 
   // ======================================================
   // GET PRODUCT
@@ -42,7 +46,7 @@ export default function ProductDetails() {
         //   data: {...product}
         // }
 
-        setProduct(response?.data || null);
+        setProduct(response?.product || response?.data || null);
       } catch (error) {
         console.error("Failed to load product:", error);
 
@@ -66,7 +70,19 @@ export default function ProductDetails() {
 
   const handleAddToCart = async () => {
     if (!product) return;
+    if (!token) {
+      localStorage.setItem(
+        "pending_cart_action",
+        JSON.stringify({ productId: product._id, quantity: quantity })
+      );
+      toast("Please create an account or login to add this product to your cart.");
+      navigate("/login");
+      return;
+    }
+    await performAddToCart();
+  };
 
+  const performAddToCart = async () => {
     try {
       setAdding(true);
 
@@ -87,6 +103,7 @@ export default function ProductDetails() {
       dispatch(setCart(cartResponse?.data || null));
 
       toast.success("Product added to cart");
+      navigate("/cart");
     } catch (error) {
       console.error("Add to cart error:", error);
 
@@ -469,6 +486,7 @@ export default function ProductDetails() {
           </div>
         </section>
       )}
+      <OtpModal isOpen={showOtp} onClose={() => setShowOtp(false)} onSuccess={performAddToCart} />
     </div>
   );
 }

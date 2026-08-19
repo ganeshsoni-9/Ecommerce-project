@@ -1,1 +1,1 @@
-import api from "./api";export const dashboard=()=>api.get("/admin/dashboard");export const users=()=>api.get("/admin/users");export const updateRole=(id,role)=>api.patch(`/admin/users/${id}/role`,{role});
+import api from "./api";export const dashboard=()=>api.get("/admin/dashboard");export const users=()=>api.get("/admin/users");export const updateRole=(id,role)=>api.patch(`/admin/users/${id}/role`,{role});export const toggleUserStatus=(id)=>api.patch(`/admin/users/${id}/status`);

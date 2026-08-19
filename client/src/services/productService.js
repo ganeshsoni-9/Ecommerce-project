@@ -98,3 +98,17 @@ export const deleteProduct = async (id) => {
 
   return data;
 };
+
+// ======================================================
+// REVIEWS
+// ======================================================
+
+export const listReviews = async (productId) => {
+  const { data } = await api.get(`/reviews/product/${productId}`);
+  return data;
+};
+
+export const createReview = async (productId, reviewData) => {
+  const { data } = await api.post(`/reviews/product/${productId}`, reviewData);
+  return data;
+};

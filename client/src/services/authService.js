@@ -1,1 +1,1 @@
-import api from './api'; export const register=d=>api.post('/auth/register',d); export const login=d=>api.post('/auth/login',d); export const me=()=>api.get('/auth/me');
+import api from './api'; export const register=d=>api.post('/auth/register',d); export const login=d=>api.post('/auth/login',d); export const me=()=>api.get('/auth/me'); export const sendOtp=d=>api.post('/auth/send-otp',d); export const verifyOtp=d=>api.post('/auth/verify-otp',d);

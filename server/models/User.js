@@ -44,6 +44,22 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
+    verificationMethod: {
+      type: String,
+      enum: ["EMAIL", "MOBILE"],
+      default: "EMAIL",
+    },
+
+    otp: {
+      type: String,
+      default: null,
+    },
+
+    otpExpires: {
+      type: Date,
+      default: null,
+    },
+
     isActive: {
       type: Boolean,
       default: true,

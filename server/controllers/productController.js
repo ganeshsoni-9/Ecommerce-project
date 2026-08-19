@@ -1,4 +1,6 @@
 const Product = require("../models/Product");
+const Category = require("../models/Category");
+const mongoose = require("mongoose");
 
 const getProducts = async (req, res) => {
   try {
@@ -16,7 +18,16 @@ const getProducts = async (req, res) => {
     };
 
     if (category) {
-      filter.category = category;
+      if (mongoose.Types.ObjectId.isValid(category)) {
+        filter.category = category;
+      } else {
+        const cat = await Category.findOne({ slug: category });
+        if (cat) {
+          filter.category = cat._id;
+        } else {
+          filter.category = new mongoose.Types.ObjectId();
+        }
+      }
     }
 
     if (search) {
