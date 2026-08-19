@@ -1,0 +1,1 @@
+import {createSlice} from "@reduxjs/toolkit";const s=createSlice({name:"wishlist",initialState:{products:[]},reducers:{setWishlist:(s,a)=>{s.products=a.payload?.products||[]}}});export const{setWishlist}=s.actions;export default s.reducer;

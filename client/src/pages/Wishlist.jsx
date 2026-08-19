@@ -1,0 +1,1 @@
+import {Link} from "react-router-dom";export default function Wishlist(){return <div className="container-page py-20"><div className="card p-10 text-center max-w-2xl mx-auto"><h1 className="text-4xl font-black">Wishlist</h1><p className="mt-4 text-slate-500">Your saved products will appear here.</p><Link className="btn-primary mt-7" to="/shop">Explore shop</Link></div></div>}

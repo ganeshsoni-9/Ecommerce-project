@@ -1,0 +1,3 @@
+const Wishlist=require("../models/Wishlist");
+exports.get=async(req,res,next)=>{try{let w=await Wishlist.findOne({user:req.user._id}).populate("products");if(!w)w=await Wishlist.create({user:req.user._id,products:[]});res.json({success:true,data:w})}catch(e){next(e)}};
+exports.toggle=async(req,res,next)=>{try{let w=await Wishlist.findOne({user:req.user._id});if(!w)w=await Wishlist.create({user:req.user._id,products:[]});const id=req.body.productId;const has=w.products.some(x=>x.toString()===id);if(has)w.products=w.products.filter(x=>x.toString()!==id);else w.products.push(id);await w.save();await w.populate("products");res.json({success:true,data:w})}catch(e){next(e)}};

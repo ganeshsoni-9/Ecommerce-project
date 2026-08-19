@@ -1,0 +1,1 @@
+const r=require("express").Router();const c=require("../controllers/couponController");const{protect}=require("../middleware/authMiddleware");const roles=require("../middleware/adminMiddleware");r.post("/validate",protect,c.validate);r.get("/",protect,roles("ADMIN"),c.list);r.post("/",protect,roles("ADMIN"),c.create);module.exports=r;

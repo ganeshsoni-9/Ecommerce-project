@@ -1,0 +1,1 @@
+export default function EmptyState({title="Nothing here yet",text="Try another option."}){return <div className="card p-10 text-center"><h3 className="font-bold text-lg">{title}</h3><p className="mt-2 text-slate-500">{text}</p></div>}

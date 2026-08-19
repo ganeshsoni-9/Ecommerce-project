@@ -1,0 +1,1 @@
+import api from "./api";export const createOrder=d=>api.post("/orders",d);export const myOrders=()=>api.get("/orders/mine");export const getOrder=id=>api.get(`/orders/${id}`);

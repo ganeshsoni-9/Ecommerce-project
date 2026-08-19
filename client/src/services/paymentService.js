@@ -1,0 +1,1 @@
+import api from "./api";export const createPayment=d=>api.post("/payments/create",d);export const verifyPayment=d=>api.post("/payments/verify",d);

@@ -1,0 +1,1 @@
+export default function AdminProducts(){return <div><h1 className="text-3xl font-black">Product Management</h1><div className="card p-8 mt-6"><p className="text-slate-500">Management APIs are connected and role protected. Build/edit forms can use the product and order REST endpoints exposed by this project.</p></div></div>}

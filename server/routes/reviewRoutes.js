@@ -1,0 +1,1 @@
+const r=require("express").Router();const c=require("../controllers/reviewController");const{protect}=require("../middleware/authMiddleware");r.get("/product/:productId",c.list);r.post("/product/:productId",protect,c.create);module.exports=r;

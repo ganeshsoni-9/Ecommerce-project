@@ -1,0 +1,1 @@
+import {createSlice} from "@reduxjs/toolkit";const s=createSlice({name:"productSlice",initialState:{items:[],data:null},reducers:{setData:(s,a)=>{s.data=a.payload},setItems:(s,a)=>{s.items=a.payload||[]}}});export const{setData,setItems}=s.actions;export default s.reducer;

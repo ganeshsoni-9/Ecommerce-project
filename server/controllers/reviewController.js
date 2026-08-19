@@ -1,0 +1,3 @@
+const Review=require("../models/Review");const Product=require("../models/Product");
+exports.list=async(req,res,next)=>{try{res.json({success:true,data:await Review.find({product:req.params.productId}).populate("user","name avatar").sort("-createdAt")})}catch(e){next(e)}};
+exports.create=async(req,res,next)=>{try{const r=await Review.create({...req.body,product:req.params.productId,user:req.user._id});const stats=await Review.aggregate([{$match:{product:r.product}},{$group:{_id:null,avg:{$avg:"$rating"},count:{$sum:1}}}]);await Product.findByIdAndUpdate(r.product,{rating:stats[0]?.avg||0,reviewCount:stats[0]?.count||0});res.status(201).json({success:true,data:r})}catch(e){next(e)}};

@@ -1,0 +1,1 @@
+const r=require("express").Router();const c=require("../controllers/userController");const{protect}=require("../middleware/authMiddleware");r.use(protect);r.get("/profile",c.profile);r.put("/profile",c.update);r.get("/addresses",c.addresses);r.post("/addresses",c.addresses);r.delete("/addresses/:id",c.deleteAddress);module.exports=r;

@@ -1,0 +1,4 @@
+const nodemailer=require("nodemailer");
+const sendEmail=async({to,subject,html})=>{if(!process.env.EMAIL_USER)return {skipped:true};const t=nodemailer.createTransport({host:process.env.EMAIL_HOST,port:Number(process.env.EMAIL_PORT||587),secure:Number(process.env.EMAIL_PORT)===465,auth:{user:process.env.EMAIL_USER,pass:process.env.EMAIL_PASS}});return t.sendMail({from:process.env.EMAIL_USER,to,subject,html})};
+exports.sendEmail=sendEmail; exports.sendWelcome=(u)=>sendEmail({to:u.email,subject:"Welcome to CommerceScale",html:`<h2>Welcome, ${u.name}</h2><p>Your CommerceScale account is ready.</p>`});
+exports.sendOrderConfirmation=(u,o)=>sendEmail({to:u.email,subject:`Order ${o.orderNumber} confirmed`,html:`<h2>Thanks for your order</h2><p>Order: ${o.orderNumber}</p><p>Total: ₹${o.totalAmount}</p>`});

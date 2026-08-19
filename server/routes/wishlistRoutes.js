@@ -1,0 +1,1 @@
+const r=require("express").Router();const c=require("../controllers/wishlistController");const{protect}=require("../middleware/authMiddleware");r.use(protect);r.get("/",c.get);r.post("/toggle",c.toggle);module.exports=r;

@@ -1,0 +1,1 @@
+import {createSlice} from "@reduxjs/toolkit";const s=createSlice({name:"cart",initialState:{items:[]},reducers:{setCart:(s,a)=>{s.items=a.payload?.items||[]},clearCart:s=>{s.items=[]}}});export const{setCart,clearCart}=s.actions;export default s.reducer;

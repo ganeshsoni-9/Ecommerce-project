@@ -1,0 +1,1 @@
+import {useSelector } from 'react-redux';export default function useAuth(){return useSelector(s=>s.auth)}

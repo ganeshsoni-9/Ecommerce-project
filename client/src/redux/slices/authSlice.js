@@ -1,0 +1,2 @@
+import {createSlice} from "@reduxjs/toolkit";const token=localStorage.getItem("cs_token");const user=JSON.parse(localStorage.getItem("cs_user")||"null");
+const s=createSlice({name:"auth",initialState:{token,user},reducers:{setAuth:(s,a)=>{s.token=a.payload.token;s.user=a.payload.user;localStorage.setItem("cs_token",a.payload.token);localStorage.setItem("cs_user",JSON.stringify(a.payload.user))},logout:s=>{s.token=null;s.user=null;localStorage.removeItem("cs_token");localStorage.removeItem("cs_user")}}});export const{setAuth,logout}=s.actions;export default s.reducer;

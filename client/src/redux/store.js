@@ -1,0 +1,1 @@
+import {configureStore} from "@reduxjs/toolkit";import auth from "./slices/authSlice";import cart from "./slices/cartSlice";import wishlist from "./slices/wishlistSlice";export default configureStore({reducer:{auth,cart,wishlist}});

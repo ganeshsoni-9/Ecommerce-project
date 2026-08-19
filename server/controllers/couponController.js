@@ -1,0 +1,4 @@
+const Coupon=require("../models/Coupon");
+exports.validate=async(req,res,next)=>{try{const c=await Coupon.findOne({code:req.body.code.toUpperCase(),isActive:true});if(!c||c.expiryDate&&c.expiryDate<new Date())return res.status(400).json({success:false,message:"Coupon invalid or expired"});if(c.usageLimit&&c.usedCount>=c.usageLimit)return res.status(400).json({success:false,message:"Coupon usage limit reached"});if(Number(req.body.amount)<c.minimumOrderAmount)return res.status(400).json({success:false,message:`Minimum order ₹${c.minimumOrderAmount}`});res.json({success:true,data:c})}catch(e){next(e)}};
+exports.list=async(req,res,next)=>{try{res.json({success:true,data:await Coupon.find().sort("-createdAt")})}catch(e){next(e)}};
+exports.create=async(req,res,next)=>{try{res.status(201).json({success:true,data:await Coupon.create(req.body)})}catch(e){next(e)}};

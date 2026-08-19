@@ -1,0 +1,1 @@
+const r=require("express").Router();const c=require("../controllers/authController");r.post("/register",c.register);r.post("/login",c.login);r.get("/me",require("../middleware/authMiddleware").protect,c.me);r.post("/forgot-password",c.forgotPassword);r.post("/reset-password",c.resetPassword);module.exports=r;

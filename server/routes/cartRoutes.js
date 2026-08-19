@@ -1,0 +1,1 @@
+const r=require("express").Router();const c=require("../controllers/cartController");const{protect}=require("../middleware/authMiddleware");r.use(protect);r.get("/",c.get);r.post("/items",c.add);r.patch("/items/:productId",c.update);r.delete("/items/:productId",c.remove);r.delete("/",c.clear);module.exports=r;
