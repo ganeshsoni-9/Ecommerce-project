@@ -19,6 +19,16 @@ const cartItemSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+
+    size: {
+      type: String,
+      default: "",
+    },
+
+    color: {
+      type: String,
+      default: "",
+    },
   },
   { _id: false }
 );

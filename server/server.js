@@ -18,6 +18,7 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const couponRoutes = require("./routes/couponRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 
@@ -105,6 +106,8 @@ app.use("/api/coupons", couponRoutes);
 app.use("/api/reviews", reviewRoutes);
 
 app.use("/api/admin", adminRoutes);
+
+app.use("/api/notifications", notificationRoutes);
 
 // ======================================================
 // 404 HANDLER

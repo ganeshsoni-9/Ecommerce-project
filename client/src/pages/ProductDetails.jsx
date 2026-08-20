@@ -20,10 +20,12 @@ export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [product, setProduct] = useState(null);
+    const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
   const [showOtp, setShowOtp] = useState(false);
 
   const dispatch = useDispatch();
@@ -39,14 +41,15 @@ export default function ProductDetails() {
         setLoading(true);
 
         const response = await getProduct(id);
+        const prod = response?.product || response?.data || null;
+        setProduct(prod);
 
-        // API response:
-        // {
-        //   success: true,
-        //   data: {...product}
-        // }
-
-        setProduct(response?.product || response?.data || null);
+        if (prod?.sizes?.length > 0) {
+          setSelectedSize(prod.sizes[0]);
+        }
+        if (prod?.colors?.length > 0) {
+          setSelectedColor(prod.colors[0]);
+        }
       } catch (error) {
         console.error("Failed to load product:", error);
 
@@ -65,48 +68,82 @@ export default function ProductDetails() {
   }, [id]);
 
   // ======================================================
-  // ADD TO CART
+  // ADD TO CART & BUY NOW
   // ======================================================
 
   const handleAddToCart = async () => {
     if (!product) return;
+    if (product.sizes?.length > 0 && !selectedSize) {
+      toast.error("Please select a size");
+      return;
+    }
+    if (product.colors?.length > 0 && !selectedColor) {
+      toast.error("Please select a color");
+      return;
+    }
     if (!token) {
       localStorage.setItem(
         "pending_cart_action",
-        JSON.stringify({ productId: product._id, quantity: quantity })
+        JSON.stringify({
+          productId: product._id,
+          quantity,
+          size: selectedSize,
+          color: selectedColor
+        })
       );
       toast("Please create an account or login to add this product to your cart.");
       navigate("/login");
       return;
     }
-    await performAddToCart();
+    await performAddToCart(false);
   };
 
-  const performAddToCart = async () => {
+  const handleBuyNow = async () => {
+    if (!product) return;
+    if (product.sizes?.length > 0 && !selectedSize) {
+      toast.error("Please select a size");
+      return;
+    }
+    if (product.colors?.length > 0 && !selectedColor) {
+      toast.error("Please select a color");
+      return;
+    }
+    if (!token) {
+      localStorage.setItem(
+        "pending_cart_action",
+        JSON.stringify({
+          productId: product._id,
+          quantity,
+          size: selectedSize,
+          color: selectedColor,
+          isBuyNow: true
+        })
+      );
+      toast("Please create an account or login to checkout.");
+      navigate("/login");
+      return;
+    }
+    await performAddToCart(true);
+  };
+
+  const performAddToCart = async (isBuyNow = false) => {
     try {
       setAdding(true);
 
-      // cartService expects:
-      // addToCart(productId, quantity)
+      await addToCart(product._id, quantity, selectedSize, selectedColor);
 
-      await addToCart(product._id, quantity);
-
-      // Refresh cart after adding product
+      // Refresh cart
       const cartResponse = await getCart();
-
-      // API response:
-      // {
-      //   success: true,
-      //   data: {...cart}
-      // }
-
       dispatch(setCart(cartResponse?.data || null));
 
-      toast.success("Product added to cart");
-      navigate("/cart");
+      toast.success(isBuyNow ? "Proceeding to checkout..." : "Product added to cart");
+      if (isBuyNow) {
+        navigate("/checkout");
+      } else {
+        navigate("/cart");
+      }
     } catch (error) {
       console.error("Add to cart error:", error);
-
       toast.error(
         error.response?.data?.message ||
           "Please login to add products to cart"
@@ -320,7 +357,12 @@ export default function ProductDetails() {
                   <button
                     key={size}
                     type="button"
-                    className="border border-slate-300 rounded-xl px-4 py-2 text-sm font-semibold hover:border-indigo-600 hover:text-indigo-600"
+                    onClick={() => setSelectedSize(size)}
+                    className={`border rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                      selectedSize === size
+                        ? "border-slate-900 text-slate-900 bg-slate-100"
+                        : "border-slate-300 text-slate-600 hover:border-slate-400"
+                    }`}
                   >
                     {size}
                   </button>
@@ -339,12 +381,18 @@ export default function ProductDetails() {
 
               <div className="flex flex-wrap gap-2">
                 {product.colors.map((color) => (
-                  <span
+                  <button
                     key={color}
-                    className="border border-slate-300 rounded-xl px-4 py-2 text-sm"
+                    type="button"
+                    onClick={() => setSelectedColor(color)}
+                    className={`border rounded-xl px-4 py-2 text-sm transition ${
+                      selectedColor === color
+                        ? "border-slate-900 text-slate-900 bg-slate-100 font-bold"
+                        : "border-slate-300 text-slate-600 hover:border-slate-400"
+                    }`}
                   >
                     {color}
-                  </span>
+                  </button>
                 ))}
               </div>
             </div>
@@ -393,22 +441,30 @@ export default function ProductDetails() {
             </div>
           )}
 
-          {/* ADD TO CART */}
+          {/* BUTTONS */}
 
-          <button
-            type="button"
-            onClick={handleAddToCart}
-            disabled={isOutOfStock || adding}
-            className="btn-primary mt-8 w-full md:w-auto inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ShoppingCart size={19} />
+          <div className="flex flex-col sm:flex-row gap-3 mt-8">
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={isOutOfStock || adding}
+              className="btn-primary flex-1 inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed py-3"
+            >
+              <ShoppingCart size={19} />
+              {adding ? "Adding..." : isOutOfStock ? "Out of Stock" : "Add to Cart"}
+            </button>
 
-            {adding
-              ? "Adding..."
-              : isOutOfStock
-              ? "Out of Stock"
-              : "Add to Cart"}
-          </button>
+            {!isOutOfStock && (
+              <button
+                type="button"
+                onClick={handleBuyNow}
+                disabled={adding}
+                className="btn-light flex-1 inline-flex items-center justify-center gap-2 font-bold py-3"
+              >
+                Buy Now
+              </button>
+            )}
+          </div>
 
           {/* BENEFITS */}
 

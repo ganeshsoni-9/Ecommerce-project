@@ -1,6 +1,67 @@
 const Cart=require("../models/Cart");const Product=require("../models/Product");
 exports.get=async(req,res,next)=>{try{let c=await Cart.findOne({user:req.user._id}).populate("items.product");if(!c)c=await Cart.create({user:req.user._id,items:[]});res.json({success:true,data:c})}catch(e){next(e)}};
-exports.add=async(req,res,next)=>{try{const{productId,quantity=1}=req.body;const p=await Product.findById(productId);if(!p||!p.isActive)return res.status(404).json({success:false,message:"Product not found"});if(p.stock<quantity)return res.status(400).json({success:false,message:"Insufficient stock"});let c=await Cart.findOne({user:req.user._id});if(!c)c=await Cart.create({user:req.user._id,items:[]});const i=c.items.find(x=>x.product.toString()===productId);if(i)i.quantity+=Number(quantity);else c.items.push({product:productId,quantity:Number(quantity),price:p.price});if(i&&i.quantity>p.stock)return res.status(400).json({success:false,message:"Insufficient stock"});await c.save();await c.populate("items.product");res.json({success:true,data:c})}catch(e){next(e)}};
-exports.update=async(req,res,next)=>{try{const c=await Cart.findOne({user:req.user._id});const i=c?.items.find(x=>x.product.toString()===req.params.productId);if(!i)return res.status(404).json({success:false,message:"Cart item not found"});const p=await Product.findById(req.params.productId);if(req.body.quantity<1)i.quantity=1;else if(req.body.quantity>p.stock)return res.status(400).json({success:false,message:"Insufficient stock"});else i.quantity=Number(req.body.quantity);await c.save();await c.populate("items.product");res.json({success:true,data:c})}catch(e){next(e)}};
-exports.remove=async(req,res,next)=>{try{const c=await Cart.findOne({user:req.user._id});c.items=c.items.filter(i=>i.product.toString()!==req.params.productId);await c.save();await c.populate("items.product");res.json({success:true,data:c})}catch(e){next(e)}};
+exports.add = async (req, res, next) => {
+  try {
+    const { productId, quantity = 1, size = "", color = "" } = req.body;
+    const p = await Product.findById(productId);
+    if (!p || !p.isActive) return res.status(404).json({ success: false, message: "Product not found" });
+    if (p.stock < quantity) return res.status(400).json({ success: false, message: "Insufficient stock" });
+
+    let c = await Cart.findOne({ user: req.user._id });
+    if (!c) c = await Cart.create({ user: req.user._id, items: [] });
+
+    const i = c.items.find(
+      (x) => x.product.toString() === productId && x.size === size && x.color === color
+    );
+    if (i) i.quantity += Number(quantity);
+    else c.items.push({ product: productId, quantity: Number(quantity), price: p.price, size, color });
+
+    if (i && i.quantity > p.stock) return res.status(400).json({ success: false, message: "Insufficient stock" });
+
+    await c.save();
+    await c.populate("items.product");
+    res.json({ success: true, data: c });
+  } catch (e) {
+    next(e);
+  }
+};
+
+exports.update = async (req, res, next) => {
+  try {
+    const { size = "", color = "", quantity } = req.body;
+    const c = await Cart.findOne({ user: req.user._id });
+    const i = c?.items.find(
+      (x) => x.product.toString() === req.params.productId && x.size === size && x.color === color
+    );
+    if (!i) return res.status(404).json({ success: false, message: "Cart item not found" });
+
+    const p = await Product.findById(req.params.productId);
+    if (quantity < 1) i.quantity = 1;
+    else if (quantity > p.stock) return res.status(400).json({ success: false, message: "Insufficient stock" });
+    else i.quantity = Number(quantity);
+
+    await c.save();
+    await c.populate("items.product");
+    res.json({ success: true, data: c });
+  } catch (e) {
+    next(e);
+  }
+};
+
+exports.remove = async (req, res, next) => {
+  try {
+    const { size = "", color = "" } = req.query;
+    const c = await Cart.findOne({ user: req.user._id });
+    if (c) {
+      c.items = c.items.filter(
+        (i) => !(i.product.toString() === req.params.productId && i.size === size && i.color === color)
+      );
+      await c.save();
+      await c.populate("items.product");
+    }
+    res.json({ success: true, data: c });
+  } catch (e) {
+    next(e);
+  }
+};
 exports.clear=async(req,res,next)=>{try{const c=await Cart.findOne({user:req.user._id});if(c){c.items=[];await c.save()}res.json({success:true,message:"Cart cleared"})}catch(e){next(e)}};

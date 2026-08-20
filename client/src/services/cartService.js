@@ -20,7 +20,9 @@ export const getCart = async () => {
 
 export const addToCart = async (
   productOrData,
-  quantity = 1
+  quantity = 1,
+  size = "",
+  color = ""
 ) => {
   let payload;
 
@@ -37,6 +39,8 @@ export const addToCart = async (
     payload = {
       productId: productOrData.productId,
       quantity: Number(productOrData.quantity) || 1,
+      size: productOrData.size || "",
+      color: productOrData.color || "",
     };
   }
 
@@ -47,6 +51,8 @@ export const addToCart = async (
     payload = {
       productId: productOrData,
       quantity: Number(quantity) || 1,
+      size: size || "",
+      color: color || "",
     };
   }
 
@@ -60,19 +66,20 @@ export const addToCart = async (
 
 // ======================================================
 // UPDATE CART ITEM
-//
-// Example:
-// updateCartItem(productId, 2)
 // ======================================================
 
 export const updateCartItem = async (
   productId,
-  quantity
+  quantity,
+  size = "",
+  color = ""
 ) => {
   const { data } = await api.put(
     `/cart/${productId}`,
     {
       quantity: Number(quantity),
+      size,
+      color,
     }
   );
 
@@ -93,7 +100,9 @@ export const updateCartItem = async (
 
 export const updateCart = async (
   productId,
-  quantityOrData
+  quantityOrData,
+  size = "",
+  color = ""
 ) => {
   let quantity;
 
@@ -108,7 +117,9 @@ export const updateCart = async (
 
   return updateCartItem(
     productId,
-    Number(quantity)
+    Number(quantity),
+    size,
+    color
   );
 };
 
@@ -120,10 +131,15 @@ export const updateCart = async (
 // ======================================================
 
 export const removeFromCart = async (
-  productId
+  productId,
+  size = "",
+  color = ""
 ) => {
   const { data } = await api.delete(
-    `/cart/${productId}`
+    `/cart/${productId}`,
+    {
+      params: { size, color }
+    }
   );
 
   return data;
@@ -136,9 +152,11 @@ export const removeFromCart = async (
 // ======================================================
 
 export const removeCart = async (
-  productId
+  productId,
+  size = "",
+  color = ""
 ) => {
-  return removeFromCart(productId);
+  return removeFromCart(productId, size, color);
 };
 
 // ======================================================

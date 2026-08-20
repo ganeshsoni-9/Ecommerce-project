@@ -34,6 +34,38 @@ const orderItemSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    size: {
+      type: String,
+      default: "",
+    },
+
+    color: {
+      type: String,
+      default: "",
+    },
+  },
+  { _id: false }
+);
+
+const trackingEventSchema = new mongoose.Schema(
+  {
+    status: {
+      type: String,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      default: "",
+    },
+    timestamp: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { _id: false }
 );
@@ -125,6 +157,12 @@ const orderSchema = new mongoose.Schema(
       min: 0,
     },
 
+    shippingCharge: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
     totalAmount: {
       type: Number,
       required: true,
@@ -145,28 +183,60 @@ const orderSchema = new mongoose.Schema(
 
     paymentStatus: {
       type: String,
-      enum: ["PENDING", "PAID", "FAILED", "REFUNDED"],
+      enum: ["PENDING", "PAID", "FAILED", "REFUND_PENDING", "REFUNDED"],
       default: "PENDING",
     },
 
     orderStatus: {
       type: String,
       enum: [
-        "PENDING",
+        "PLACED",
         "CONFIRMED",
         "PROCESSING",
+        "PACKED",
         "SHIPPED",
         "OUT_FOR_DELIVERY",
         "DELIVERED",
         "CANCELLED",
       ],
-      default: "PENDING",
+      default: "PLACED",
     },
 
     trackingNumber: {
       type: String,
       default: "",
       trim: true,
+    },
+
+    courierName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    estimatedDeliveryDate: {
+      type: Date,
+      default: null,
+    },
+
+    trackingHistory: {
+      type: [trackingEventSchema],
+      default: [],
+    },
+
+    razorpayOrderId: {
+      type: String,
+      default: "",
+    },
+
+    razorpayPaymentId: {
+      type: String,
+      default: "",
+    },
+
+    razorpaySignature: {
+      type: String,
+      default: "",
     },
 
     notes: {
@@ -182,6 +252,17 @@ const orderSchema = new mongoose.Schema(
     cancelledAt: {
       type: Date,
       default: null,
+    },
+
+    cancellationReason: {
+      type: String,
+      default: "",
+    },
+
+    refundStatus: {
+      type: String,
+      enum: ["refund_pending", "refund_initiated", "refunded", "refund_failed", ""],
+      default: "",
     },
   },
   {
